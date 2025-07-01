@@ -12,7 +12,14 @@ void AutoWiFi::connect() {
     preferences.end();
 
     if (ssid.isEmpty() || password.isEmpty()) {
-        Serial.println("[AutoWiFi] No WiFi credentials found.");
+        Serial.println("[AutoWiFi] No WiFi credentials found. Configuring access point.");
+
+        if (!WiFi.softAP("TODO")) {
+            Serial.println("Failed to create AP.");
+            while(1);
+        }
+
+        Serial.println("AP created.");
     } else {
         Serial.printf("[AutoWiFi] Found SSID: %s, Will attempt to connect.\n", ssid.c_str());
         WiFi.begin(ssid, password);
@@ -24,9 +31,10 @@ void AutoWiFi::connect() {
 
         Serial.println("");
         Serial.println("WiFi connected.");
-        Serial.println("IP address: ");
-        Serial.println(getIP());
     }
+    
+    Serial.println("IP address: ");
+    Serial.println(getIP());
 }
 
 void AutoWiFi::update() {}
