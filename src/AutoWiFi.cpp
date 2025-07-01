@@ -5,7 +5,7 @@ Preferences preferences;
 
 AutoWiFi::AutoWiFi(const char* apSSID) : _apSSID(apSSID) {}
 
-void AutoWiFi::connect() {
+bool AutoWiFi::connect() {
     preferences.begin("wifi", true);
     String ssid = preferences.getString("ssid", "");
     String password = preferences.getString("password", "");
@@ -13,17 +13,21 @@ void AutoWiFi::connect() {
 
     if (ssid.isEmpty() || password.isEmpty()) {
         Serial.println("[AutoWiFi] No WiFi credentials found. Configuring access point.");
-        startAccessPoint();
+        _startupSuccess = startAccessPoint();
     } else {
         Serial.printf("[AutoWiFi] Found SSID: %s. Attempting to connect...\n", ssid.c_str());
-        connectToWiFi(ssid, password);
+        _startupSuccess = connectToWiFi(ssid, password);
     }
 
-    Serial.println("IP address: ");
-    Serial.println(getIP());
+    if (_startupSuccess) {
+        Serial.println("IP address: ");
+        Serial.println(getIP());
+    }
+
+    return _startupSuccess;
 }
 
-void AutoWiFi::connectToWiFi(const String& ssid, const String& password) {
+bool AutoWiFi::connectToWiFi(const String& ssid, const String& password) {
     WiFi.begin(ssid.c_str(), password.c_str());
 
     int retries = 0;
@@ -37,17 +41,20 @@ void AutoWiFi::connectToWiFi(const String& ssid, const String& password) {
     Serial.println();
     if (WiFi.status() == WL_CONNECTED) {
         Serial.println("[AutoWiFi] WiFi connected.");
+        return true;
     } else {
         Serial.println("[AutoWiFi] Failed to connect to WiFi.");
+        return false;
     }
 }
 
-void AutoWiFi::startAccessPoint() {
+bool AutoWiFi::startAccessPoint() {
     if (!WiFi.softAP(_apSSID)) {
         Serial.println("[AutoWiFi] Failed to start AP.");
-        while (1);
+        return false;
     }
     Serial.printf("[AutoWiFi] AP '%s' started.\n", _apSSID);
+    return true;
 }
 
 void AutoWiFi::update() {}

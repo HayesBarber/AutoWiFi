@@ -6,16 +6,17 @@
 class AutoWiFi {
 public:
     AutoWiFi(const char* apSSID = "AutoWiFi");
-    void connect();
+    bool connect();
     void update();
     bool isConnected() const;
     IPAddress getIP() const;
 
 private:
-    void connectToWiFi(const String& ssid, const String& password);
-    void startAccessPoint();
+    bool connectToWiFi(const String& ssid, const String& password);
+    bool startAccessPoint();
 
     const char* _apSSID;
+    bool _startupSuccess = false;
 };
 
 #endif
