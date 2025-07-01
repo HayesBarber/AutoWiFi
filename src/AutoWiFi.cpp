@@ -14,7 +14,18 @@ void AutoWiFi::connect() {
     if (ssid.isEmpty() || password.isEmpty()) {
         Serial.println("[AutoWiFi] No WiFi credentials found.");
     } else {
-        Serial.printf("[AutoWiFi] Found SSID: %s\n", ssid.c_str());
+        Serial.printf("[AutoWiFi] Found SSID: %s, Will attempt to connect.\n", ssid.c_str());
+        WiFi.begin(ssid, password);
+
+        while (WiFi.status() != WL_CONNECTED) {
+            delay(500);
+            Serial.print(".");
+        }
+
+        Serial.println("");
+        Serial.println("WiFi connected.");
+        Serial.println("IP address: ");
+        Serial.println(getIP());
     }
 }
 
