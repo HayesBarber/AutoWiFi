@@ -2,6 +2,7 @@
 #define AUTOWIFI_H
 
 #include <WiFi.h>
+#include <RestBeacon.h>
 
 class AutoWiFi {
 public:
@@ -13,7 +14,7 @@ public:
 
     AutoWiFi(const char* apSSID = "AutoWiFi");
     State connect();
-    void update();
+    void loop();
     IPAddress getIP() const;
     State getState() const;
 
@@ -23,6 +24,7 @@ private:
 
     const char* _apSSID;
     State _state;
+    RestBeacon _beacon;
 };
 
 #endif
