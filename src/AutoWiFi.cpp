@@ -60,7 +60,15 @@ AutoWiFi::State AutoWiFi::startAccessPoint() {
 void AutoWiFi::update() {}
 
 IPAddress AutoWiFi::getIP() const {
-    return WiFi.localIP();
+    switch (_state) {
+        case State::WIFI_CONNECTED:
+            return WiFi.localIP();
+        case State::AP_MODE:
+            return WiFi.softAPIP();
+        case State::NOT_CONNECTED:
+        default:
+            return IPAddress(0, 0, 0, 0);
+    }
 }
 
 AutoWiFi::State AutoWiFi::getState() const {
