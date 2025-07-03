@@ -1,11 +1,11 @@
 #include "AutoWiFi.h"
 #include <Preferences.h>
 
-Preferences preferences;
 
 AutoWiFi::AutoWiFi(const char* apSSID) : _apSSID(apSSID), _state(State::NOT_CONNECTED) {}
 
 AutoWiFi::State AutoWiFi::connect() {
+    Preferences preferences;
     preferences.begin("wifi", true);
     String ssid = preferences.getString("ssid", "");
     String password = preferences.getString("password", "");
