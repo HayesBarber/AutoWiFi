@@ -5,18 +5,24 @@
 
 class AutoWiFi {
 public:
+    enum class State {
+        WIFI_CONNECTED,
+        AP_MODE,
+        NOT_CONNECTED
+    };
+
     AutoWiFi(const char* apSSID = "AutoWiFi");
-    bool connect();
+    State connect();
     void update();
-    bool isConnected() const;
     IPAddress getIP() const;
+    State getState() const;
 
 private:
-    bool connectToWiFi(const String& ssid, const String& password);
-    bool startAccessPoint();
+    State connectToWiFi(const String& ssid, const String& password);
+    State startAccessPoint();
 
     const char* _apSSID;
-    bool _startupSuccess = false;
+    State _state;
 };
 
 #endif
