@@ -53,11 +53,38 @@ AutoWiFi::State AutoWiFi::startAccessPoint() {
         Serial.println("[AutoWiFi] Failed to start AP.");
         return State::NOT_CONNECTED;
     }
+
     Serial.printf("[AutoWiFi] AP '%s' started.\n", _apSSID);
+
+    _beacon.begin();
+    _beacon.onMessage([](const Message& msg) -> String {
+        String ssid = msg.getProperty("ssid");
+        String password = msg.getProperty("password");
+
+        if (ssid.isEmpty() || password.isEmpty()) {
+            return "Missing SSID or password";
+        }
+
+        Preferences preferences;
+        preferences.begin("wifi", false);
+        preferences.putString("ssid", ssid);
+        preferences.putString("password", password);
+        preferences.end();
+
+        Serial.println("[AutoWiFi] Credentials saved. Restarting...");
+        delay(1000);
+        ESP.restart();
+        return "Credentials saved, restarting...";
+    });
+
     return State::AP_MODE;
 }
 
-void AutoWiFi::update() {}
+void AutoWiFi::loop() {
+    if (_state == State::AP_MODE) {
+        _beacon.loop();
+    }
+}
 
 IPAddress AutoWiFi::getIP() const {
     switch (_state) {
