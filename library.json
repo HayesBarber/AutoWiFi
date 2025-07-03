@@ -8,5 +8,11 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/HayesBarber/AutoWiFi.git"
-  }
+  },
+  "dependencies": [
+    {
+      "name": "RestBeacon",
+      "version": "https://github.com/HayesBarber/RestBeacon.git#main"
+    }
+  ]
 }
