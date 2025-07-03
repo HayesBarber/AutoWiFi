@@ -1,0 +1,12 @@
+{
+  "name": "AutoWiFi",
+  "version": "0.1.0",
+  "description": "Wifi connection with access point provisioning",
+  "frameworks": "arduino",
+  "license": "MIT",
+  "platforms": "espressif32",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HayesBarber/AutoWiFi.git"
+  }
+}
