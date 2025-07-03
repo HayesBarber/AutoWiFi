@@ -3,9 +3,9 @@
 
 Preferences preferences;
 
-AutoWiFi::AutoWiFi(const char* apSSID) : _apSSID(apSSID) {}
+AutoWiFi::AutoWiFi(const char* apSSID) : _apSSID(apSSID), _state(State::NOT_CONNECTED) {}
 
-bool AutoWiFi::connect() {
+AutoWiFi::State AutoWiFi::connect() {
     preferences.begin("wifi", true);
     String ssid = preferences.getString("ssid", "");
     String password = preferences.getString("password", "");
@@ -13,21 +13,21 @@ bool AutoWiFi::connect() {
 
     if (ssid.isEmpty() || password.isEmpty()) {
         Serial.println("[AutoWiFi] No WiFi credentials found. Configuring access point.");
-        _startupSuccess = startAccessPoint();
+        _state = startAccessPoint();
     } else {
         Serial.printf("[AutoWiFi] Found SSID: %s. Attempting to connect...\n", ssid.c_str());
-        _startupSuccess = connectToWiFi(ssid, password);
+        _state = connectToWiFi(ssid, password);
     }
 
-    if (_startupSuccess) {
+    if (_state != State::NOT_CONNECTED) {
         Serial.println("IP address: ");
         Serial.println(getIP());
     }
 
-    return _startupSuccess;
+    return _state;
 }
 
-bool AutoWiFi::connectToWiFi(const String& ssid, const String& password) {
+AutoWiFi::State AutoWiFi::connectToWiFi(const String& ssid, const String& password) {
     WiFi.begin(ssid.c_str(), password.c_str());
 
     int retries = 0;
@@ -41,28 +41,28 @@ bool AutoWiFi::connectToWiFi(const String& ssid, const String& password) {
     Serial.println();
     if (WiFi.status() == WL_CONNECTED) {
         Serial.println("[AutoWiFi] WiFi connected.");
-        return true;
+        return State::WIFI_CONNECTED;
     } else {
         Serial.println("[AutoWiFi] Failed to connect to WiFi.");
-        return false;
+        return State::NOT_CONNECTED;
     }
 }
 
-bool AutoWiFi::startAccessPoint() {
+AutoWiFi::State AutoWiFi::startAccessPoint() {
     if (!WiFi.softAP(_apSSID)) {
         Serial.println("[AutoWiFi] Failed to start AP.");
-        return false;
+        return State::NOT_CONNECTED;
     }
     Serial.printf("[AutoWiFi] AP '%s' started.\n", _apSSID);
-    return true;
+    return State::AP_MODE;
 }
 
 void AutoWiFi::update() {}
 
-bool AutoWiFi::isConnected() const {
-    return WiFi.isConnected();
-}
-
 IPAddress AutoWiFi::getIP() const {
     return WiFi.localIP();
+}
+
+AutoWiFi::State AutoWiFi::getState() const {
+    return _state;
 }
