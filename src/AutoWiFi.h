@@ -17,8 +17,7 @@ public:
     void loop();
     IPAddress getIP() const;
     State getState() const;
-    void setAccessPointSSID(const char* ssid);
-    void setAccessPointPassword(const char* password);
+    void setAccessPointCredentials(const char* ssid, const char* password);
 
 private:
     State connectToWiFi(const String& ssid, const String& password);

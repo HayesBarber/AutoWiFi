@@ -117,10 +117,7 @@ AutoWiFi::State AutoWiFi::getState() const {
     return _state;
 }
 
-void AutoWiFi::setAccessPointSSID(const char* ssid) {
+void AutoWiFi::setAccessPointCredentials(const char* ssid, const char* password) {
     _apSSID = ssid;
-}
-
-void AutoWiFi::setAccessPointPassword(const char* password) {
     _apPassword = password;
 }
