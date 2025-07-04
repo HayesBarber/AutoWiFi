@@ -120,4 +120,10 @@ AutoWiFi::State AutoWiFi::getState() const {
 void AutoWiFi::setAccessPointCredentials(const char* ssid, const char* password) {
     _apSSID = ssid;
     _apPassword = password;
+
+    Preferences preferences;
+    preferences.begin("ap", false);
+    preferences.putString("ssid", _apSSID);
+    preferences.putString("password", _apPassword);
+    preferences.end();
 }
