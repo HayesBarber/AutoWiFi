@@ -128,4 +128,5 @@ void AutoWiFi::setAccessPointCredentials(const String& ssid, const String& passw
     preferences.putString("ssid", ssid);
     preferences.putString("password", password);
     preferences.end();
+    Serial.println("Access point credentials set");
 }
