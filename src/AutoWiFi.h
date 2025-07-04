@@ -12,17 +12,20 @@ public:
         NOT_CONNECTED
     };
 
-    AutoWiFi(const char* apSSID = "AutoWiFi");
+    AutoWiFi();
     State connect();
     void loop();
     IPAddress getIP() const;
     State getState() const;
+    void setAccessPointSSID(const char* ssid);
+    void setAccessPointPassword(const char* password);
 
 private:
     State connectToWiFi(const String& ssid, const String& password);
     State startAccessPoint();
 
     const char* _apSSID;
+    const char* _apPassword;
     State _state;
     RestBeacon _beacon;
 };

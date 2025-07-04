@@ -2,7 +2,7 @@
 #include <Preferences.h>
 
 
-AutoWiFi::AutoWiFi(const char* apSSID) : _apSSID(apSSID), _state(State::NOT_CONNECTED) {}
+AutoWiFi::AutoWiFi() : _apSSID("AutoWiFi"), _apPassword(nullptr), _state(State::NOT_CONNECTED) {}
 
 AutoWiFi::State AutoWiFi::connect() {
     Preferences preferences;
@@ -49,7 +49,12 @@ AutoWiFi::State AutoWiFi::connectToWiFi(const String& ssid, const String& passwo
 }
 
 AutoWiFi::State AutoWiFi::startAccessPoint() {
-    if (!WiFi.softAP(_apSSID)) {
+    if (_apPassword == nullptr || strlen(_apPassword) < 8) {
+        Serial.println("[AutoWiFi] AP password not set or too short. Cannot start AP.");
+        return State::NOT_CONNECTED;
+    }
+
+    if (!WiFi.softAP(_apSSID, _apPassword)) {
         Serial.println("[AutoWiFi] Failed to start AP.");
         return State::NOT_CONNECTED;
     }
@@ -110,4 +115,12 @@ IPAddress AutoWiFi::getIP() const {
 
 AutoWiFi::State AutoWiFi::getState() const {
     return _state;
+}
+
+void AutoWiFi::setAccessPointSSID(const char* ssid) {
+    _apSSID = ssid;
+}
+
+void AutoWiFi::setAccessPointPassword(const char* password) {
+    _apPassword = password;
 }
