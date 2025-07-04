@@ -4,6 +4,8 @@
 AutoWiFi::AutoWiFi() : _state(State::NOT_CONNECTED) {}
 
 AutoWiFi::State AutoWiFi::connect() {
+    checkForDeviceReset();
+
     Preferences preferences;
     preferences.begin("wifi", true);
     String ssid = preferences.getString("ssid", "");
@@ -93,8 +95,8 @@ AutoWiFi::State AutoWiFi::startAccessPoint() {
 void AutoWiFi::loop() {
     if (_state == State::AP_MODE) {
         _beacon.loop();
-    } else if (WiFi.status() != WL_CONNECTED) {
-        Serial.println("[AutoWiFi] No wifi connection. Attempting to reconnect...");
+    } else if (_state == State::NOT_CONNECTED || WiFi.status() != WL_CONNECTED) {
+        Serial.println("[AutoWiFi] No connection. Attempting to reconnect...");
         State result = connect();
         if (result == State::WIFI_CONNECTED) {
             _state = result;
@@ -128,4 +130,49 @@ void AutoWiFi::setAccessPointCredentials(const String& ssid, const String& passw
     preferences.putString("ssid", ssid);
     preferences.putString("password", password);
     preferences.end();
+    Serial.println("Access point credentials set");
+}
+
+void AutoWiFi::checkForDeviceReset() {
+    Preferences bootPrefs;
+    bootPrefs.begin("boot", false);
+    int bootCount = bootPrefs.getInt("boot_count", 0);
+    bootCount += 1;
+    bootPrefs.putInt("boot_count", bootCount);
+    bootPrefs.end();
+
+    Serial.printf("[AutoWiFi] current boot count: %d\n", bootCount);
+
+    if (bootCount >= 4) {
+        Serial.println("[AutoWiFi] Detected 5 fast reboots. Clearing WiFi credentials.");
+        Preferences wifiPrefs;
+        wifiPrefs.begin("wifi", false);
+        bool result = wifiPrefs.clear();
+        wifiPrefs.end();
+        Serial.printf("[AutoWiFi] Preferences clear result: %s. Restarting...\n", result ? "success" : "failure");
+        ESP.restart();
+    }
+
+    xTaskCreatePinnedToCore(
+        bootResetTask,
+        "BootResetTask",
+        1000,
+        NULL,
+        1,
+        NULL,
+        1
+    );
+}
+
+void AutoWiFi::bootResetTask(void* parameter) {
+    vTaskDelay(4000 / portTICK_PERIOD_MS);
+
+    Preferences prefs;
+    prefs.begin("boot", false);
+    prefs.putInt("boot_count", 0);
+    prefs.end();
+
+    Serial.println("[AutoWiFi] boot count reset to 0");
+
+    vTaskDelete(NULL);
 }
