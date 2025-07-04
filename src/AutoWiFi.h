@@ -22,6 +22,8 @@ public:
 private:
     State connectToWiFi(const String& ssid, const String& password);
     State startAccessPoint();
+    void checkForDeviceReset();
+    static void bootResetTask(void* parameter);
 
     State _state;
     RestBeacon _beacon;

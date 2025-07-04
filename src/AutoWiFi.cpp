@@ -4,6 +4,8 @@
 AutoWiFi::AutoWiFi() : _state(State::NOT_CONNECTED) {}
 
 AutoWiFi::State AutoWiFi::connect() {
+    checkForDeviceReset();
+
     Preferences preferences;
     preferences.begin("wifi", true);
     String ssid = preferences.getString("ssid", "");
@@ -129,4 +131,47 @@ void AutoWiFi::setAccessPointCredentials(const String& ssid, const String& passw
     preferences.putString("password", password);
     preferences.end();
     Serial.println("Access point credentials set");
+}
+
+void AutoWiFi::checkForDeviceReset() {
+    Preferences bootPrefs;
+    bootPrefs.begin("boot", false);
+    int bootCount = bootPrefs.getInt("boot_count", 0);
+    bootCount += 1;
+    bootPrefs.putInt("boot_count", bootCount);
+    bootPrefs.end();
+
+    Serial.printf("[AutoWiFi] current boot count: %d\n", bootCount);
+
+    if (bootCount >= 4) {
+        Serial.println("[AutoWiFi] Detected 5 fast reboots. Clearing WiFi credentials.");
+        Preferences wifiPrefs;
+        wifiPrefs.begin("wifi", false);
+        wifiPrefs.clear();
+        wifiPrefs.end();
+        ESP.restart();
+    }
+
+    xTaskCreatePinnedToCore(
+        bootResetTask,
+        "BootResetTask",
+        1000,
+        NULL,
+        1,
+        NULL,
+        1
+    );
+}
+
+void AutoWiFi::bootResetTask(void* parameter) {
+    vTaskDelay(4000 / portTICK_PERIOD_MS);
+
+    Preferences prefs;
+    prefs.begin("boot", false);
+    prefs.putInt("boot_count", 0);
+    prefs.end();
+
+    Serial.println("[AutoWiFi] boot count reset to 0");
+
+    vTaskDelete(NULL);
 }
