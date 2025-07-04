@@ -1,8 +1,7 @@
 #include "AutoWiFi.h"
 #include <Preferences.h>
 
-
-AutoWiFi::AutoWiFi() : _apSSID("AutoWiFi"), _apPassword(nullptr), _state(State::NOT_CONNECTED) {}
+AutoWiFi::AutoWiFi() : _state(State::NOT_CONNECTED) {}
 
 AutoWiFi::State AutoWiFi::connect() {
     Preferences preferences;
@@ -49,17 +48,23 @@ AutoWiFi::State AutoWiFi::connectToWiFi(const String& ssid, const String& passwo
 }
 
 AutoWiFi::State AutoWiFi::startAccessPoint() {
-    if (_apPassword == nullptr || strlen(_apPassword) < 8) {
-        Serial.println("[AutoWiFi] AP password not set or too short. Cannot start AP.");
+    Preferences preferences;
+    preferences.begin("ap", true);
+    String ssid = preferences.getString("ssid", "");
+    String password = preferences.getString("password", "");
+    preferences.end();
+
+    if (ssid.isEmpty() || password.length() < 8) {
+        Serial.println("[AutoWiFi] AP credentials missing or password too short. Cannot start AP.");
         return State::NOT_CONNECTED;
     }
 
-    if (!WiFi.softAP(_apSSID, _apPassword)) {
+    if (!WiFi.softAP(ssid, password)) {
         Serial.println("[AutoWiFi] Failed to start AP.");
         return State::NOT_CONNECTED;
     }
 
-    Serial.printf("[AutoWiFi] AP '%s' started.\n", _apSSID);
+    Serial.printf("[AutoWiFi] AP '%s' started.\n", ssid);
 
     _beacon.begin();
     _beacon.onMessage([](const Message& msg) -> String {
@@ -117,10 +122,10 @@ AutoWiFi::State AutoWiFi::getState() const {
     return _state;
 }
 
-void AutoWiFi::setAccessPointSSID(const char* ssid) {
-    _apSSID = ssid;
-}
-
-void AutoWiFi::setAccessPointPassword(const char* password) {
-    _apPassword = password;
+void AutoWiFi::setAccessPointCredentials(const String& ssid, const String& password) {
+    Preferences preferences;
+    preferences.begin("ap", false);
+    preferences.putString("ssid", ssid);
+    preferences.putString("password", password);
+    preferences.end();
 }
