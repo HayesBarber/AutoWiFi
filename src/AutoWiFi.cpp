@@ -83,6 +83,16 @@ AutoWiFi::State AutoWiFi::startAccessPoint() {
 void AutoWiFi::loop() {
     if (_state == State::AP_MODE) {
         _beacon.loop();
+    } else if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("[AutoWiFi] No wifi connection. Attempting to reconnect...");
+        State result = connect();
+        if (result == State::WIFI_CONNECTED) {
+            _state = result;
+        } else {
+            Serial.println("[AutoWiFi] Reconnection failed. Restarting in 10 seconds...");
+            delay(10000);
+            ESP.restart();
+        }
     }
 }
 
