@@ -17,14 +17,12 @@ public:
     void loop();
     IPAddress getIP() const;
     State getState() const;
-    void setAccessPointCredentials(const char* ssid, const char* password);
+    void setAccessPointCredentials(const String& ssid, const String& password);
 
 private:
     State connectToWiFi(const String& ssid, const String& password);
     State startAccessPoint();
 
-    const char* _apSSID;
-    const char* _apPassword;
     State _state;
     RestBeacon _beacon;
 };
