@@ -25,6 +25,7 @@ private:
     State startAccessPoint();
     void checkForDeviceReset();
     static void bootResetTask(void* parameter);
+    void setupOTA();
 
     State _state;
     RestBeacon _beacon;

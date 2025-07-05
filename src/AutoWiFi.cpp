@@ -1,5 +1,6 @@
 #include "AutoWiFi.h"
 #include <Preferences.h>
+#include <ArduinoOTA.h>
 
 AutoWiFi::AutoWiFi() : _state(State::NOT_CONNECTED) {}
 
@@ -23,6 +24,10 @@ AutoWiFi::State AutoWiFi::connect() {
     if (_state != State::NOT_CONNECTED) {
         Serial.println("IP address: ");
         Serial.println(getIP());
+    }
+
+    if (_state == State::WIFI_CONNECTED) {
+        setupOTA();
     }
 
     return _state;
@@ -105,6 +110,8 @@ void AutoWiFi::loop() {
             delay(10000);
             ESP.restart();
         }
+    } else {
+        ArduinoOTA.handle();
     }
 }
 
@@ -184,4 +191,8 @@ void AutoWiFi::bootResetTask(void* parameter) {
     Serial.println("[AutoWiFi] boot count reset to 0");
 
     vTaskDelete(NULL);
+}
+
+void AutoWiFi::setupOTA() {
+
 }
