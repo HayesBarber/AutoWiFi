@@ -29,7 +29,7 @@ AutoWiFi::State AutoWiFi::connect() {
     }
 
     if (_state != State::NOT_CONNECTED) {
-        Serial.printf("[AutoWiFi] IP address: %s", getIP().toString().c_str());
+        Serial.printf("[AutoWiFi] IP address: %s\n", getIP().toString().c_str());
     }
 
     if (_state == State::WIFI_CONNECTED) {
@@ -251,6 +251,6 @@ AutoWiFi::OTAState AutoWiFi::setupOTA() {
     ArduinoOTA.setHostname(hostName.c_str());
     ArduinoOTA.setPassword(password.c_str());
     ArduinoOTA.begin();
-    Serial.println("[AutoWiFi] OTA initialized");
+    Serial.printf("[AutoWiFi] OTA initialized for hostname %s\n", hostName.c_str());
     return OTAState::OTA_INITIALIZED;
 }
