@@ -13,3 +13,11 @@ response=$(curl -s -X POST "http://$esp_ip/message" \
     -d "$json_payload")
 
 echo "Response from ESP: $response"
+
+restart_payload=$(jq -n '{restart: "true"}')
+
+restart_response=$(curl -s -X POST "http://$esp_ip/message" \
+    -H "Content-Type: application/json" \
+    -d "$restart_payload")
+
+echo "Restart response from ESP: $restart_response"
