@@ -200,7 +200,7 @@ void AutoWiFi::checkForDeviceReset() {
     Serial.printf("[AutoWiFi] current boot count: %d\n", bootCount);
 
     if (bootCount >= 4) {
-        Serial.println("[AutoWiFi] Detected 5 fast reboots. Clearing WiFi credentials.");
+        Serial.println("[AutoWiFi] Detected 4 fast reboots. Clearing WiFi credentials.");
         Preferences wifiPrefs;
         wifiPrefs.begin(WIFI_NS, false);
         bool result = wifiPrefs.clear();
