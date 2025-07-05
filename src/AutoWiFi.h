@@ -13,11 +13,48 @@ public:
     };
 
     AutoWiFi();
+
+    /**
+     * Attempts to connect to a saved WiFi network or starts an access point if credentials are missing.
+     * Also sets up OTA if WiFi connection is successful.
+     *
+     * @return Current connection state after attempting to connect.
+     */
     State connect();
+
+    /**
+     * Must be called periodically. Handles OTA updates, reconnection attempts, and access point logic.
+     */
     void loop();
+
+    /**
+     * Returns the current IP address depending on the connection state.
+     *
+     * @return IPAddress representing the device's IP.
+     */
     IPAddress getIP() const;
+
+    /**
+     * Returns the current connection state.
+     *
+     * @return Current state as a value of AutoWiFi::State.
+     */
     State getState() const;
+
+    /**
+     * Stores access point credentials in persistent storage.
+     *
+     * @param ssid SSID for the access point.
+     * @param password Password for the access point (must be at least 8 characters).
+     */
     void setAccessPointCredentials(const String& ssid, const String& password);
+
+    /**
+     * Stores OTA credentials in persistent storage.
+     *
+     * @param hostName Hostname to use for OTA.
+     * @param password Password for OTA authentication (must be at least 8 characters).
+     */
     void setOTACredentials(const String& hostName, const String& password);
 
 private:
