@@ -133,6 +133,15 @@ void AutoWiFi::setAccessPointCredentials(const String& ssid, const String& passw
     Serial.println("Access point credentials set");
 }
 
+void AutoWiFi::setOTACredentials(const String& hostName, const String& password) {
+    Preferences preferences;
+    preferences.begin("OTA", false);
+    preferences.putString("hostName", hostName);
+    preferences.putString("password", password);
+    preferences.end();
+    Serial.println("OTA credentials set");
+}
+
 void AutoWiFi::checkForDeviceReset() {
     Preferences bootPrefs;
     bootPrefs.begin("boot", false);

@@ -18,6 +18,7 @@ public:
     IPAddress getIP() const;
     State getState() const;
     void setAccessPointCredentials(const String& ssid, const String& password);
+    void setOTACredentials(const String& hostName, const String& password);
 
 private:
     State connectToWiFi(const String& ssid, const String& password);
