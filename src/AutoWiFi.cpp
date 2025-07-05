@@ -9,7 +9,7 @@ namespace {
     constexpr const char* BOOT_NS = "boot";
 }
 
-AutoWiFi::AutoWiFi() : _state(State::NOT_CONNECTED) {}
+AutoWiFi::AutoWiFi() : _state(State::NOT_CONNECTED), _otaState(OTAState::NOT_CONNECTED) {}
 
 AutoWiFi::State AutoWiFi::connect() {
     checkForDeviceReset();
@@ -34,7 +34,7 @@ AutoWiFi::State AutoWiFi::connect() {
     }
 
     if (_state == State::WIFI_CONNECTED) {
-        setupOTA();
+        _otaState = setupOTA();
     }
 
     return _state;
@@ -107,7 +107,7 @@ void AutoWiFi::loop() {
         _beacon.loop();
     } else if (_state == State::NOT_CONNECTED || WiFi.status() != WL_CONNECTED) {
         handleDisconnected();
-    } else {
+    } else if (_otaState == OTAState::OTA_INITIALIZED) {
         ArduinoOTA.handle();
     }
 }
@@ -233,16 +233,17 @@ void AutoWiFi::bootResetTask(void* parameter) {
     vTaskDelete(NULL);
 }
 
-void AutoWiFi::setupOTA() {
+AutoWiFi::OTAState AutoWiFi::setupOTA() {
     auto [hostName, password] = getOTACredentials();
 
     if (hostName.isEmpty() || password.length() < 8) {
         Serial.println("[AutoWiFi] OTA credentials missing or password too short. Cannot setup OTA.");
-        return;
+        return OTAState::NOT_CONNECTED;
     }
 
     ArduinoOTA.setHostname(hostName.c_str());
     ArduinoOTA.setPassword(password.c_str());
     ArduinoOTA.begin();
     Serial.println("[AutoWiFi] OTA initialized");
+    return OTAState::OTA_INITIALIZED;
 }

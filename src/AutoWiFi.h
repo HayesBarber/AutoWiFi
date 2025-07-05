@@ -12,6 +12,11 @@ public:
         NOT_CONNECTED
     };
 
+    enum class OTAState {
+        OTA_INITIALIZED,
+        NOT_CONNECTED
+    };
+
     AutoWiFi();
 
     /**
@@ -70,13 +75,14 @@ private:
     State startAccessPoint();
     void checkForDeviceReset();
     static void bootResetTask(void* parameter);
-    void setupOTA();
+    OTAState setupOTA();
     std::tuple<String, String> getOTACredentials();
     void handleDisconnected();
     void restartDevice(unsigned long delayMs);
     bool waitForWiFiConnection();
 
     State _state;
+    OTAState _otaState;
     RestBeacon _beacon;
 };
 
