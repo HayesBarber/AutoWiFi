@@ -28,9 +28,29 @@ void setup() {
     // Set initial credentials
     wifi.setAccessPointCredentials("MyDeviceAP", "ap_password");
     wifi.setOTACredentials("esp32-device", "ota_secure_pw");
+    wifi.setWiFiCredentials("your_ssid", "your_ssid_password");
 
     Serial.println("Credentials written. You may now flash your main sketch.");
 }
 
 void loop() {}
 ```
+
+### 2. Provisioning via Access Point + Script
+
+If your device starts in Access Point mode, you can use the included `provision.sh` script to send WiFi credentials to it over HTTP.
+
+This requires:
+
+- The ESP32 to be running AutoWiFi in AP mode
+- Your computer to connect to the ESP32's access point (e.g., `MyDeviceAP`)
+
+Run the script as follows:
+
+```bash
+bash provision.sh
+```
+
+The script will prompt for the SSID and password and send them to the ESP32 at `192.168.4.1`.
+
+Although the ESP32’s access point uses WPA2 encryption, credentials are still sent over plain HTTP. This means they could be intercepted by someone else connected to the AP. While safe for most personal use, consider serial provisioning.

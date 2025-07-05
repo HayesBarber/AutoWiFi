@@ -47,7 +47,7 @@ public:
      * @param ssid SSID for the access point.
      * @param password Password for the access point (must be at least 8 characters).
      */
-    void setAccessPointCredentials(const String& ssid, const String& password);
+    static void setAccessPointCredentials(const String& ssid, const String& password);
 
     /**
      * Stores OTA credentials in persistent storage.
@@ -55,7 +55,15 @@ public:
      * @param hostName Hostname to use for OTA.
      * @param password Password for OTA authentication (must be at least 8 characters).
      */
-    void setOTACredentials(const String& hostName, const String& password);
+    static void setOTACredentials(const String& hostName, const String& password);
+
+    /**
+     * Stores WiFi credentials in persistent storage.
+     *
+     * @param ssid SSID for the access point.
+     * @param password Password for WiFi (must be at least 8 characters).
+     */
+    static void setWiFiCredentials(const String& ssid, const String& password);
 
 private:
     State connectToWiFi(const String& ssid, const String& password);

@@ -78,16 +78,9 @@ AutoWiFi::State AutoWiFi::startAccessPoint() {
             return "Missing SSID or password";
         }
 
-        Preferences preferences;
-        preferences.begin(WIFI_NS, false);
-        preferences.putString("ssid", ssid);
-        preferences.putString("password", password);
-        preferences.end();
+        setWiFiCredentials(ssid, password);
 
-        Serial.println("[AutoWiFi] Credentials saved. Restarting...");
-        delay(1000);
-        ESP.restart();
-        return "Credentials saved, restarting...";
+        return "Credentials saved.";
     });
 
     return State::AP_MODE;
@@ -135,6 +128,15 @@ void AutoWiFi::setOTACredentials(const String& hostName, const String& password)
     preferences.putString("password", password);
     preferences.end();
     Serial.println("OTA credentials set");
+}
+
+void AutoWiFi::setWiFiCredentials(const String &ssid, const String &password) {
+    Preferences preferences;
+    preferences.begin(WIFI_NS, false);
+    preferences.putString("ssid", ssid);
+    preferences.putString("password", password);
+    preferences.end();
+    Serial.println("WiFi credentials set");
 }
 
 std::tuple<String, String> AutoWiFi::getOTACredentials() {
