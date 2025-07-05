@@ -204,5 +204,10 @@ void AutoWiFi::bootResetTask(void* parameter) {
 }
 
 void AutoWiFi::setupOTA() {
+    auto [hostName, password] = getOTACredentials();
 
+    ArduinoOTA.setHostname(hostName.c_str());
+    ArduinoOTA.setPassword(password.c_str());
+    ArduinoOTA.begin();
+    Serial.println("OTA initialized");
 }
