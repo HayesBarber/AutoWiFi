@@ -26,6 +26,7 @@ private:
     void checkForDeviceReset();
     static void bootResetTask(void* parameter);
     void setupOTA();
+    std::tuple<String, String> getOTACredentials();
 
     State _state;
     RestBeacon _beacon;

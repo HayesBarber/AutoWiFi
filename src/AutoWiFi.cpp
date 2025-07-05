@@ -149,6 +149,16 @@ void AutoWiFi::setOTACredentials(const String& hostName, const String& password)
     Serial.println("OTA credentials set");
 }
 
+std::tuple<String, String> AutoWiFi::getOTACredentials() {
+    Preferences preferences;
+    preferences.begin("OTA", true);
+    String hostName = preferences.getString("hostName", "");
+    String password = preferences.getString("password", "");
+    preferences.end();
+
+    return std::make_tuple(hostName, password);
+}
+
 void AutoWiFi::checkForDeviceReset() {
     Preferences bootPrefs;
     bootPrefs.begin("boot", false);
