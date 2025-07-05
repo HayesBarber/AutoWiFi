@@ -4,7 +4,7 @@ read -p "Enter WiFi SSID: " ssid
 read -s -p "Enter WiFi Password: " password
 echo
 
-esp_ip="192.168.4.1"
+esp_ip="192.168.4.1:8080"
 
 json_payload=$(jq -n --arg ssid "$ssid" --arg password "$password" '{ssid: $ssid, password: $password}')
 

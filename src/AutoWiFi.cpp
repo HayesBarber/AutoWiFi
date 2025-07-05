@@ -9,7 +9,7 @@ namespace {
     constexpr const char* BOOT_NS = "boot";
 }
 
-AutoWiFi::AutoWiFi() : _state(State::NOT_CONNECTED), _otaState(OTAState::NOT_CONNECTED) {}
+AutoWiFi::AutoWiFi() : _state(State::NOT_CONNECTED), _otaState(OTAState::NOT_CONNECTED), _beacon(8080) {}
 
 AutoWiFi::State AutoWiFi::connect() {
     checkForDeviceReset();
