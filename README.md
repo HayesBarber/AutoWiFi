@@ -76,3 +76,9 @@ void loop() {
     wifi.loop();
 }
 ```
+
+### Re-provisioning
+
+If your WiFi credentials change and you want the device to return to access point mode, simply power cycle the device **4 times** with less than 4 seconds between each boot.
+
+This will wipe any persisted WiFi credentials and automatically restart the device in access point mode, allowing it to be re-provisioned.
