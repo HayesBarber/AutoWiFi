@@ -71,6 +71,22 @@ AutoWiFi::State AutoWiFi::startAccessPoint() {
 
     _beacon.begin();
     _beacon.onMessage([](const Message& msg) -> String {
+        if (msg.getProperty("restart") == "true") {
+            xTaskCreatePinnedToCore(
+                [](void*) {
+                    delay(5000);
+                    ESP.restart();
+                },
+                "RestartTask",
+                1000,
+                NULL,
+                1,
+                NULL,
+                1
+            );
+            return "restarting in 5 seconds";
+        }
+
         String ssid = msg.getProperty("ssid");
         String password = msg.getProperty("password");
 
