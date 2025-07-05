@@ -29,6 +29,7 @@ private:
     std::tuple<String, String> getOTACredentials();
     void handleDisconnected();
     void restartDevice(unsigned long delayMs);
+    bool waitForWiFiConnection();
 
     State _state;
     RestBeacon _beacon;

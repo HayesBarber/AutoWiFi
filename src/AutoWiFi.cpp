@@ -35,23 +35,12 @@ AutoWiFi::State AutoWiFi::connect() {
 
 AutoWiFi::State AutoWiFi::connectToWiFi(const String& ssid, const String& password) {
     WiFi.begin(ssid.c_str(), password.c_str());
-
-    int retries = 0;
-    const int maxRetries = 20;
-
-    while (WiFi.status() != WL_CONNECTED && retries++ < maxRetries) {
-        delay(500);
-        Serial.print(".");
-    }
-
-    Serial.println();
-    if (WiFi.status() == WL_CONNECTED) {
+    if (waitForWiFiConnection()) {
         Serial.println("[AutoWiFi] WiFi connected.");
         return State::WIFI_CONNECTED;
-    } else {
-        Serial.println("[AutoWiFi] Failed to connect to WiFi.");
-        return State::NOT_CONNECTED;
     }
+    Serial.println("[AutoWiFi] Failed to connect to WiFi.");
+    return State::NOT_CONNECTED;
 }
 
 AutoWiFi::State AutoWiFi::startAccessPoint() {
@@ -163,6 +152,16 @@ void AutoWiFi::handleDisconnected() {
 void AutoWiFi::restartDevice(unsigned long delayMs) {
     delay(delayMs);
     ESP.restart();
+}
+
+bool AutoWiFi::waitForWiFiConnection() {
+    unsigned long start = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - start < 10000) {
+        delay(500);
+        Serial.print(".");
+    }
+    Serial.println();
+    return WiFi.status() == WL_CONNECTED;
 }
 
 void AutoWiFi::checkForDeviceReset() {
