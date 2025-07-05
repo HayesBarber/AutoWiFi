@@ -220,7 +220,7 @@ void AutoWiFi::checkForDeviceReset() {
     xTaskCreatePinnedToCore(
         bootResetTask,
         "BootResetTask",
-        1000,
+        2048,
         NULL,
         1,
         NULL,
