@@ -2,13 +2,20 @@
 #include <Preferences.h>
 #include <ArduinoOTA.h>
 
+namespace {
+    constexpr const char* WIFI_NS = "wifi";
+    constexpr const char* AP_NS   = "ap";
+    constexpr const char* OTA_NS  = "OTA";
+    constexpr const char* BOOT_NS = "boot";
+}
+
 AutoWiFi::AutoWiFi() : _state(State::NOT_CONNECTED) {}
 
 AutoWiFi::State AutoWiFi::connect() {
     checkForDeviceReset();
 
     Preferences preferences;
-    preferences.begin("wifi", true);
+    preferences.begin(WIFI_NS, true);
     String ssid = preferences.getString("ssid", "");
     String password = preferences.getString("password", "");
     preferences.end();
@@ -35,28 +42,17 @@ AutoWiFi::State AutoWiFi::connect() {
 
 AutoWiFi::State AutoWiFi::connectToWiFi(const String& ssid, const String& password) {
     WiFi.begin(ssid.c_str(), password.c_str());
-
-    int retries = 0;
-    const int maxRetries = 20;
-
-    while (WiFi.status() != WL_CONNECTED && retries++ < maxRetries) {
-        delay(500);
-        Serial.print(".");
-    }
-
-    Serial.println();
-    if (WiFi.status() == WL_CONNECTED) {
+    if (waitForWiFiConnection()) {
         Serial.println("[AutoWiFi] WiFi connected.");
         return State::WIFI_CONNECTED;
-    } else {
-        Serial.println("[AutoWiFi] Failed to connect to WiFi.");
-        return State::NOT_CONNECTED;
     }
+    Serial.println("[AutoWiFi] Failed to connect to WiFi.");
+    return State::NOT_CONNECTED;
 }
 
 AutoWiFi::State AutoWiFi::startAccessPoint() {
     Preferences preferences;
-    preferences.begin("ap", true);
+    preferences.begin(AP_NS, true);
     String ssid = preferences.getString("ssid", "");
     String password = preferences.getString("password", "");
     preferences.end();
@@ -83,7 +79,7 @@ AutoWiFi::State AutoWiFi::startAccessPoint() {
         }
 
         Preferences preferences;
-        preferences.begin("wifi", false);
+        preferences.begin(WIFI_NS, false);
         preferences.putString("ssid", ssid);
         preferences.putString("password", password);
         preferences.end();
@@ -101,15 +97,7 @@ void AutoWiFi::loop() {
     if (_state == State::AP_MODE) {
         _beacon.loop();
     } else if (_state == State::NOT_CONNECTED || WiFi.status() != WL_CONNECTED) {
-        Serial.println("[AutoWiFi] No connection. Attempting to reconnect...");
-        State result = connect();
-        if (result == State::WIFI_CONNECTED) {
-            _state = result;
-        } else {
-            Serial.println("[AutoWiFi] Reconnection failed. Restarting in 10 seconds...");
-            delay(10000);
-            ESP.restart();
-        }
+        handleDisconnected();
     } else {
         ArduinoOTA.handle();
     }
@@ -133,7 +121,7 @@ AutoWiFi::State AutoWiFi::getState() const {
 
 void AutoWiFi::setAccessPointCredentials(const String& ssid, const String& password) {
     Preferences preferences;
-    preferences.begin("ap", false);
+    preferences.begin(AP_NS, false);
     preferences.putString("ssid", ssid);
     preferences.putString("password", password);
     preferences.end();
@@ -142,7 +130,7 @@ void AutoWiFi::setAccessPointCredentials(const String& ssid, const String& passw
 
 void AutoWiFi::setOTACredentials(const String& hostName, const String& password) {
     Preferences preferences;
-    preferences.begin("OTA", false);
+    preferences.begin(OTA_NS, false);
     preferences.putString("hostName", hostName);
     preferences.putString("password", password);
     preferences.end();
@@ -151,7 +139,7 @@ void AutoWiFi::setOTACredentials(const String& hostName, const String& password)
 
 std::tuple<String, String> AutoWiFi::getOTACredentials() {
     Preferences preferences;
-    preferences.begin("OTA", true);
+    preferences.begin(OTA_NS, true);
     String hostName = preferences.getString("hostName", "");
     String password = preferences.getString("password", "");
     preferences.end();
@@ -159,9 +147,33 @@ std::tuple<String, String> AutoWiFi::getOTACredentials() {
     return std::make_tuple(hostName, password);
 }
 
+void AutoWiFi::handleDisconnected() {
+    Serial.println("[AutoWiFi] No connection. Attempting to reconnect...");
+    connect();
+    if (_state == State::NOT_CONNECTED) {
+        Serial.println("[AutoWiFi] Reconnection failed. Restarting in 10 seconds...");
+        restartDevice(10000);
+    }
+}
+
+void AutoWiFi::restartDevice(unsigned long delayMs) {
+    delay(delayMs);
+    ESP.restart();
+}
+
+bool AutoWiFi::waitForWiFiConnection() {
+    unsigned long start = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - start < 10000) {
+        delay(500);
+        Serial.print(".");
+    }
+    Serial.println();
+    return WiFi.status() == WL_CONNECTED;
+}
+
 void AutoWiFi::checkForDeviceReset() {
     Preferences bootPrefs;
-    bootPrefs.begin("boot", false);
+    bootPrefs.begin(BOOT_NS, false);
     int bootCount = bootPrefs.getInt("boot_count", 0);
     bootCount += 1;
     bootPrefs.putInt("boot_count", bootCount);
@@ -172,7 +184,7 @@ void AutoWiFi::checkForDeviceReset() {
     if (bootCount >= 4) {
         Serial.println("[AutoWiFi] Detected 5 fast reboots. Clearing WiFi credentials.");
         Preferences wifiPrefs;
-        wifiPrefs.begin("wifi", false);
+        wifiPrefs.begin(WIFI_NS, false);
         bool result = wifiPrefs.clear();
         wifiPrefs.end();
         Serial.printf("[AutoWiFi] Preferences clear result: %s. Restarting...\n", result ? "success" : "failure");
@@ -194,7 +206,7 @@ void AutoWiFi::bootResetTask(void* parameter) {
     vTaskDelay(4000 / portTICK_PERIOD_MS);
 
     Preferences prefs;
-    prefs.begin("boot", false);
+    prefs.begin(BOOT_NS, false);
     prefs.putInt("boot_count", 0);
     prefs.end();
 
@@ -208,6 +220,7 @@ void AutoWiFi::setupOTA() {
 
     if (hostName.isEmpty() || password.length() < 8) {
         Serial.println("[AutoWiFi] OTA credentials missing or password too short. Cannot setup OTA.");
+        return;
     }
 
     ArduinoOTA.setHostname(hostName.c_str());
