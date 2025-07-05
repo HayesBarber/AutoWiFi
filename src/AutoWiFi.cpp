@@ -206,6 +206,7 @@ void AutoWiFi::setupOTA() {
 
     if (hostName.isEmpty() || password.length() < 8) {
         Serial.println("[AutoWiFi] OTA credentials missing or password too short. Cannot setup OTA.");
+        return;
     }
 
     ArduinoOTA.setHostname(hostName.c_str());
