@@ -51,7 +51,7 @@ bash provision.sh
 
 The script will prompt for the SSID and password and send them to the ESP32 at `192.168.4.1`.
 
-Although the ESP32’s access point uses WPA2 encryption, credentials are still sent over plain HTTP. This means they could be intercepted by someone else connected to the AP. While safe for most personal use, consider serial provisioning.
+Although the ESP32’s access point is password protected and uses WPA2 encryption, credentials are still sent over plain HTTP. This means they could be intercepted by someone else connected to the AP. While safe for most personal use, consider serial provisioning.
 
 ### Normal Usage
 
