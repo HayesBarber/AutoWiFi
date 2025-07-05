@@ -29,8 +29,7 @@ AutoWiFi::State AutoWiFi::connect() {
     }
 
     if (_state != State::NOT_CONNECTED) {
-        Serial.println("IP address: ");
-        Serial.println(getIP());
+        Serial.printf("[AutoWiFi] IP address: %s", getIP().toString().c_str());
     }
 
     if (_state == State::WIFI_CONNECTED) {
