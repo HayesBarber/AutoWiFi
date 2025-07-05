@@ -67,7 +67,7 @@ AutoWiFi::State AutoWiFi::startAccessPoint() {
         return State::NOT_CONNECTED;
     }
 
-    Serial.printf("[AutoWiFi] AP '%s' started.\n", ssid);
+    Serial.printf("[AutoWiFi] AP '%s' started.\n", ssid.c_str());
 
     _beacon.begin();
     _beacon.onMessage([](const Message& msg) -> String {
