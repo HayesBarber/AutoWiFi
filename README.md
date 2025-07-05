@@ -54,3 +54,27 @@ bash provision.sh
 The script will prompt for the SSID and password and send them to the ESP32 at `192.168.4.1`.
 
 Although the ESP32’s access point uses WPA2 encryption, credentials are still sent over plain HTTP. This means they could be intercepted by someone else connected to the AP. While safe for most personal use, consider serial provisioning.
+
+### 3. Normal Usage
+
+Once credentials have been provisioned (via a one-time sketch or the provisioning script), `AutoWiFi` can be used in your main application to manage network connectivity and OTA updates automatically.
+
+Simply create an instance of `AutoWiFi` and call the following in your sketch:
+
+- `connect()` once in `setup()` to attempt connection or fall back to AP mode
+- `loop()` inside your `loop()` function to handle OTA and reconnection logic
+
+Example:
+
+```cpp
+AutoWiFi wifi;
+
+void setup() {
+    Serial.begin(9600);
+    wifi.connect();
+}
+
+void loop() {
+    wifi.loop();
+}
+```
