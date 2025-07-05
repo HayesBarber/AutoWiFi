@@ -1,5 +1,6 @@
 #include "AutoWiFi.h"
 #include <Preferences.h>
+#include <ArduinoOTA.h>
 
 AutoWiFi::AutoWiFi() : _state(State::NOT_CONNECTED) {}
 
@@ -23,6 +24,10 @@ AutoWiFi::State AutoWiFi::connect() {
     if (_state != State::NOT_CONNECTED) {
         Serial.println("IP address: ");
         Serial.println(getIP());
+    }
+
+    if (_state == State::WIFI_CONNECTED) {
+        setupOTA();
     }
 
     return _state;
@@ -105,6 +110,8 @@ void AutoWiFi::loop() {
             delay(10000);
             ESP.restart();
         }
+    } else {
+        ArduinoOTA.handle();
     }
 }
 
@@ -131,6 +138,25 @@ void AutoWiFi::setAccessPointCredentials(const String& ssid, const String& passw
     preferences.putString("password", password);
     preferences.end();
     Serial.println("Access point credentials set");
+}
+
+void AutoWiFi::setOTACredentials(const String& hostName, const String& password) {
+    Preferences preferences;
+    preferences.begin("OTA", false);
+    preferences.putString("hostName", hostName);
+    preferences.putString("password", password);
+    preferences.end();
+    Serial.println("OTA credentials set");
+}
+
+std::tuple<String, String> AutoWiFi::getOTACredentials() {
+    Preferences preferences;
+    preferences.begin("OTA", true);
+    String hostName = preferences.getString("hostName", "");
+    String password = preferences.getString("password", "");
+    preferences.end();
+
+    return std::make_tuple(hostName, password);
 }
 
 void AutoWiFi::checkForDeviceReset() {
@@ -175,4 +201,17 @@ void AutoWiFi::bootResetTask(void* parameter) {
     Serial.println("[AutoWiFi] boot count reset to 0");
 
     vTaskDelete(NULL);
+}
+
+void AutoWiFi::setupOTA() {
+    auto [hostName, password] = getOTACredentials();
+
+    if (hostName.isEmpty() || password.length() < 8) {
+        Serial.println("[AutoWiFi] OTA credentials missing or password too short. Cannot setup OTA.");
+    }
+
+    ArduinoOTA.setHostname(hostName.c_str());
+    ArduinoOTA.setPassword(password.c_str());
+    ArduinoOTA.begin();
+    Serial.println("[AutoWiFi] OTA initialized");
 }
