@@ -102,10 +102,8 @@ void AutoWiFi::loop() {
         _beacon.loop();
     } else if (_state == State::NOT_CONNECTED || WiFi.status() != WL_CONNECTED) {
         Serial.println("[AutoWiFi] No connection. Attempting to reconnect...");
-        State result = connect();
-        if (result == State::WIFI_CONNECTED) {
-            _state = result;
-        } else {
+        connect();
+        if (_state == State::NOT_CONNECTED) {
             Serial.println("[AutoWiFi] Reconnection failed. Restarting in 10 seconds...");
             delay(10000);
             ESP.restart();
