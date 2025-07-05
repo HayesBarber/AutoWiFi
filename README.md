@@ -11,7 +11,7 @@ AutoWiFi is an ESP32 utility that simplifies network connectivity by automatical
 - Detects multiple fast reboots and clears stored WiFi credentials for recovery
 - Includes a REST-based provisioning beacon while in AP mode
 
-### One-Time Credential Provisioning Sketch
+## One-Time Credential Provisioning Sketch
 
 To get started, flash a temporary sketch that sets your WiFi and OTA credentials using the provided methods. **Be sure not to commit this sketch to source control to avoid leaking credentials.**
 
@@ -34,7 +34,7 @@ void setup() {
 void loop() {}
 ```
 
-### Provisioning via Access Point + Script
+## Provisioning via Access Point + Script
 
 If your device starts in Access Point mode, you can use the included `provision.sh` script to send WiFi credentials to it over HTTP.
 
@@ -53,7 +53,7 @@ The script will prompt for the SSID and password and send them to the ESP32 at `
 
 Although the ESP32’s access point is password protected and uses WPA2 encryption, credentials are still sent over plain HTTP. This means they could be intercepted by someone else who manages to also connect to the AP. While safe for most personal use, consider serial provisioning.
 
-### Normal Usage
+## Normal Usage
 
 Once credentials have been provisioned (via a one-time sketch or the provisioning script), `AutoWiFi` can be used in your main application to manage network connectivity and OTA updates automatically.
 
@@ -77,7 +77,7 @@ void loop() {
 }
 ```
 
-### Re-provisioning
+## Re-provisioning
 
 If your WiFi credentials change and you want the device to return to access point mode, simply power cycle the device **4 times** with less than 4 seconds between each boot.
 
