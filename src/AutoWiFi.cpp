@@ -206,8 +206,12 @@ void AutoWiFi::bootResetTask(void* parameter) {
 void AutoWiFi::setupOTA() {
     auto [hostName, password] = getOTACredentials();
 
+    if (hostName.isEmpty() || password.length() < 8) {
+        Serial.println("[AutoWiFi] OTA credentials missing or password too short. Cannot setup OTA.");
+    }
+
     ArduinoOTA.setHostname(hostName.c_str());
     ArduinoOTA.setPassword(password.c_str());
     ArduinoOTA.begin();
-    Serial.println("OTA initialized");
+    Serial.println("[AutoWiFi] OTA initialized");
 }
