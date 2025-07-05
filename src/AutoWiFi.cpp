@@ -201,11 +201,19 @@ void AutoWiFi::checkForDeviceReset() {
 
     if (bootCount >= 4) {
         Serial.println("[AutoWiFi] Detected 4 fast reboots. Clearing WiFi credentials.");
-        Preferences wifiPrefs;
-        wifiPrefs.begin(WIFI_NS, false);
-        bool result = wifiPrefs.clear();
-        wifiPrefs.end();
-        Serial.printf("[AutoWiFi] Preferences clear result: %s. Restarting...\n", result ? "success" : "failure");
+
+        Preferences prefs;
+        prefs.begin(WIFI_NS, false);
+        bool wifiResult = prefs.clear();
+        prefs.end();
+
+        prefs.begin(BOOT_NS, false);
+        bool bootResult = prefs.clear();
+        prefs.end();
+
+        Serial.printf("[AutoWiFi] WiFi Preferences clear result: %s.\n", wifiResult ? "success" : "failure");
+        Serial.printf("[AutoWiFi] Boot Preferences clear result: %s.\n", bootResult ? "success" : "failure");
+        Serial.println("Restarting...");
         ESP.restart();
     }
 
