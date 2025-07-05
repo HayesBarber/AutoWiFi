@@ -27,6 +27,8 @@ private:
     static void bootResetTask(void* parameter);
     void setupOTA();
     std::tuple<String, String> getOTACredentials();
+    void handleDisconnected();
+    void restartDevice(unsigned long delayMs);
 
     State _state;
     RestBeacon _beacon;

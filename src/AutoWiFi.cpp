@@ -101,13 +101,7 @@ void AutoWiFi::loop() {
     if (_state == State::AP_MODE) {
         _beacon.loop();
     } else if (_state == State::NOT_CONNECTED || WiFi.status() != WL_CONNECTED) {
-        Serial.println("[AutoWiFi] No connection. Attempting to reconnect...");
-        connect();
-        if (_state == State::NOT_CONNECTED) {
-            Serial.println("[AutoWiFi] Reconnection failed. Restarting in 10 seconds...");
-            delay(10000);
-            ESP.restart();
-        }
+        handleDisconnected();
     } else {
         ArduinoOTA.handle();
     }
@@ -155,6 +149,20 @@ std::tuple<String, String> AutoWiFi::getOTACredentials() {
     preferences.end();
 
     return std::make_tuple(hostName, password);
+}
+
+void AutoWiFi::handleDisconnected() {
+    Serial.println("[AutoWiFi] No connection. Attempting to reconnect...");
+    connect();
+    if (_state == State::NOT_CONNECTED) {
+        Serial.println("[AutoWiFi] Reconnection failed. Restarting in 10 seconds...");
+        restartDevice(10000);
+    }
+}
+
+void AutoWiFi::restartDevice(unsigned long delayMs) {
+    delay(delayMs);
+    ESP.restart();
 }
 
 void AutoWiFi::checkForDeviceReset() {
