@@ -5,11 +5,10 @@ AutoWiFi is an ESP32 utility that simplifies network connectivity by automatical
 ## Features
 
 - Automatically connects to stored WiFi credentials
-- Falls back to Access Point mode for user provisioning if credentials are missing
-- Persists credentials using the built-in Preferences API
+- Falls back to Access Point mode for provisioning if credentials are missing
 - Allows over-the-air (OTA) firmware updates using ArduinoOTA
-- Detects multiple fast reboots and clears stored WiFi credentials for recovery
-- Includes a REST-based provisioning beacon while in AP mode
+- Detects multiple fast reboots and clears stored WiFi credentials for re-provisioning
+- Includes a REST-based provisioning interface while in AP mode
 
 ## One-Time Credential Provisioning Sketch
 
