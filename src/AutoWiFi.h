@@ -1,5 +1,5 @@
-#ifndef AUTOWIFI_H
-#define AUTOWIFI_H
+#ifndef AUTO_WIFI_H
+#define AUTO_WIFI_H
 
 #include <WiFi.h>
 #include <RestBeacon.h>
