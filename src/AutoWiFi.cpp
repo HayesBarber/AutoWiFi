@@ -46,11 +46,7 @@ AutoWiFi::State AutoWiFi::connectToWiFi(const String& ssid, const String& passwo
 }
 
 AutoWiFi::State AutoWiFi::startAccessPoint() {
-    Preferences preferences;
-    preferences.begin(AP_NS, true);
-    String ssid = preferences.getString("ssid", "");
-    String password = preferences.getString("password", "");
-    preferences.end();
+    auto [ssid, password] = getAPCredentials();
 
     if (ssid.isEmpty() || password.length() < 8) {
         Serial.println("[AutoWiFi] AP credentials missing or password too short. Cannot start AP.");
