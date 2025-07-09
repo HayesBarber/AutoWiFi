@@ -174,6 +174,16 @@ void AutoWiFi::setWiFiCredentials(const String &ssid, const String &password) {
     Serial.println("WiFi credentials set");
 }
 
+std::tuple<String, String> AutoWiFi::getWiFiCredentials() {
+    Preferences prefs;
+    prefs.begin(WIFI_NS, true);
+    String ssid = prefs.getString("ssid", "");
+    String password = prefs.getString("password", "");
+    prefs.end();
+    
+    return std::make_tuple(ssid, password);
+}
+
 void AutoWiFi::handleDisconnected() {
     Serial.println("[AutoWiFi] No connection. Attempting to reconnect...");
     connect();
