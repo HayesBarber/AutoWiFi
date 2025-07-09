@@ -14,11 +14,7 @@ AutoWiFi::AutoWiFi() : _state(State::NOT_CONNECTED), _otaState(OTAState::NOT_CON
 AutoWiFi::State AutoWiFi::connect() {
     checkForDeviceReset();
 
-    Preferences preferences;
-    preferences.begin(WIFI_NS, true);
-    String ssid = preferences.getString("ssid", "");
-    String password = preferences.getString("password", "");
-    preferences.end();
+    auto [ssid, password] = getWiFiCredentials();
 
     if (ssid.isEmpty() || password.isEmpty()) {
         Serial.println("[AutoWiFi] No WiFi credentials found. Configuring access point.");
