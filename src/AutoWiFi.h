@@ -78,6 +78,8 @@ private:
     static void bootResetTask(void* parameter);
     OTAState setupOTA();
     std::tuple<String, String> getOTACredentials();
+    std::tuple<String, String> getAPCredentials();
+    std::tuple<String, String> getWiFiCredentials();
     void handleDisconnected();
     void restartDevice(unsigned long delayMs);
     bool waitForWiFiConnection();

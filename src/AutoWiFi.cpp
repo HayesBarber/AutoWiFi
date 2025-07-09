@@ -136,6 +136,16 @@ void AutoWiFi::setAccessPointCredentials(const String& ssid, const String& passw
     Serial.println("Access point credentials set");
 }
 
+std::tuple<String, String> AutoWiFi::getAPCredentials() {
+    Preferences prefs;
+    prefs.begin(AP_NS, true);
+    String ssid = prefs.getString("ssid", "");
+    String password = prefs.getString("password", "");
+    prefs.end();
+    
+    return std::make_tuple(ssid, password);
+}
+
 void AutoWiFi::setOTACredentials(const String& hostName, const String& password) {
     Preferences preferences;
     preferences.begin(OTA_NS, false);
@@ -143,15 +153,6 @@ void AutoWiFi::setOTACredentials(const String& hostName, const String& password)
     preferences.putString("password", password);
     preferences.end();
     Serial.println("OTA credentials set");
-}
-
-void AutoWiFi::setWiFiCredentials(const String &ssid, const String &password) {
-    Preferences preferences;
-    preferences.begin(WIFI_NS, false);
-    preferences.putString("ssid", ssid);
-    preferences.putString("password", password);
-    preferences.end();
-    Serial.println("WiFi credentials set");
 }
 
 std::tuple<String, String> AutoWiFi::getOTACredentials() {
@@ -162,6 +163,15 @@ std::tuple<String, String> AutoWiFi::getOTACredentials() {
     preferences.end();
 
     return std::make_tuple(hostName, password);
+}
+
+void AutoWiFi::setWiFiCredentials(const String &ssid, const String &password) {
+    Preferences preferences;
+    preferences.begin(WIFI_NS, false);
+    preferences.putString("ssid", ssid);
+    preferences.putString("password", password);
+    preferences.end();
+    Serial.println("WiFi credentials set");
 }
 
 void AutoWiFi::handleDisconnected() {
