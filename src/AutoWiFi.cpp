@@ -119,7 +119,7 @@ AutoWiFi::State AutoWiFi::getState() const {
     return _state;
 }
 
-static void setCredentials(const char* ns, const char* key1, const String& val1, const char* key2, const String& val2) {
+void AutoWiFi::setCredentials(const char* ns, const char* key1, const String& val1, const char* key2, const String& val2) {
     Preferences preferences;
     preferences.begin(ns, false);
     preferences.putString(key1, val1);
@@ -127,7 +127,7 @@ static void setCredentials(const char* ns, const char* key1, const String& val1,
     preferences.end();
 }
 
-static std::tuple<String, String> getCredentials(const char* ns, const String& key1, const String& key2) {
+std::tuple<String, String> AutoWiFi::getCredentials(const char* ns, const String& key1, const String& key2) {
     Preferences preferences;
     preferences.begin(ns, true);
     String val1 = preferences.getString(key1.c_str(), "");

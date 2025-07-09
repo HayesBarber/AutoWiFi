@@ -83,6 +83,8 @@ private:
     void handleDisconnected();
     void restartDevice(unsigned long delayMs);
     bool waitForWiFiConnection();
+    static void setCredentials(const char* ns, const char* key1, const String& val1, const char* key2, const String& val2);
+    static std::tuple<String, String> getCredentials(const char* ns, const String& key1, const String& key2);
 
     State _state;
     OTAState _otaState;
