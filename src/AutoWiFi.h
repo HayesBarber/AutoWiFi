@@ -3,6 +3,7 @@
 
 #include <WiFi.h>
 #include <RestBeacon.h>
+#include <tuple>
 
 class AutoWiFi {
 public:
