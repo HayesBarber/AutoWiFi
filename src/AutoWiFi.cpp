@@ -1,6 +1,7 @@
 #include "AutoWiFi.h"
 #include <Preferences.h>
 #include <ArduinoOTA.h>
+#include <MicroStorage.h>
 
 namespace {
     constexpr const char* WIFI_NS = "wifi";
