@@ -1,6 +1,7 @@
 #include "AutoWiFi.h"
 #include <Preferences.h>
 #include <ArduinoOTA.h>
+#include <MicroStorage.h>
 
 namespace {
     constexpr const char* WIFI_NS = "wifi";
@@ -120,20 +121,17 @@ AutoWiFi::State AutoWiFi::getState() const {
 }
 
 void AutoWiFi::setCredentials(const char* ns, const char* key1, const String& val1, const char* key2, const String& val2) {
-    Preferences preferences;
-    preferences.begin(ns, false);
-    preferences.putString(key1, val1);
-    preferences.putString(key2, val2);
-    preferences.end();
+    MicroStorage::set(ns,
+        StringEntry(key1, val1),
+        StringEntry(key2, val2)
+    );
 }
 
 std::tuple<String, String> AutoWiFi::getCredentials(const char* ns, const String& key1, const String& key2) {
-    Preferences preferences;
-    preferences.begin(ns, true);
-    String val1 = preferences.getString(key1.c_str(), "");
-    String val2 = preferences.getString(key2.c_str(), "");
-    preferences.end();
-    return std::make_tuple(val1, val2);
+    return MicroStorage::get(ns,
+        StringEntry(key1.c_str(), ""),
+        StringEntry(key2.c_str(), "")
+    );
 }
 
 void AutoWiFi::setAccessPointCredentials(const String& ssid, const String& password) {

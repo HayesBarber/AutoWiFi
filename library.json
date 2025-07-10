@@ -13,6 +13,10 @@
     {
       "name": "RestBeacon",
       "version": "https://github.com/HayesBarber/RestBeacon.git#main"
+    },
+    {
+      "name": "MicroStorage",
+      "version": "https://github.com/HayesBarber/MicroStorage.git#main"
     }
   ]
 }
