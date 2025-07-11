@@ -1,5 +1,4 @@
 #include "AutoWiFi.h"
-#include <Preferences.h>
 #include <ArduinoOTA.h>
 #include <MicroStorage.h>
 
@@ -186,12 +185,9 @@ bool AutoWiFi::waitForWiFiConnection() {
 }
 
 void AutoWiFi::checkForDeviceReset() {
-    Preferences bootPrefs;
-    bootPrefs.begin(BOOT_NS, false);
-    int bootCount = bootPrefs.getInt("boot_count", 0);
+    auto [bootCount] = MicroStorage::get(BOOT_NS, IntEntry("boot_count", 0));
     bootCount += 1;
-    bootPrefs.putInt("boot_count", bootCount);
-    bootPrefs.end();
+    MicroStorage::set(BOOT_NS, IntEntry("boot_count", bootCount));
 
     Serial.printf("[AutoWiFi] current boot count: %d\n", bootCount);
 
@@ -200,7 +196,7 @@ void AutoWiFi::checkForDeviceReset() {
 
         bool success = MicroStorage::clear(WIFI_NS, BOOT_NS);
 
-        Serial.printf("[AutoWiFi] WiFi and Boot Preferences clear result: %s.\n", success ? "success" : "failure");
+        Serial.printf("[AutoWiFi] WiFi and Boot namespace clear result: %s.\n", success ? "success" : "failure");
         Serial.println("Restarting...");
         ESP.restart();
     }
@@ -219,10 +215,7 @@ void AutoWiFi::checkForDeviceReset() {
 void AutoWiFi::bootResetTask(void* parameter) {
     vTaskDelay(4000 / portTICK_PERIOD_MS);
 
-    Preferences prefs;
-    prefs.begin(BOOT_NS, false);
-    prefs.putInt("boot_count", 0);
-    prefs.end();
+    MicroStorage::set(BOOT_NS, IntEntry("boot_count", 0));
 
     Serial.println("[AutoWiFi] boot count reset to 0");
 
