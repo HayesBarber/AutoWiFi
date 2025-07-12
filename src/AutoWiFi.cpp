@@ -60,7 +60,6 @@ AutoWiFi::State AutoWiFi::startAccessPoint() {
 
     Serial.printf("[AutoWiFi] AP '%s' started.\n", ssid.c_str());
 
-    _beacon.begin();
     _beacon.onMessage([](const Message& msg) -> String {
         if (msg.getProperty("restart") == "true") {
             xTaskCreatePinnedToCore(
@@ -89,6 +88,7 @@ AutoWiFi::State AutoWiFi::startAccessPoint() {
 
         return "Credentials saved.";
     });
+    _beacon.begin();
 
     return State::AP_MODE;
 }
