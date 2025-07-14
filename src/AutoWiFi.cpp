@@ -115,6 +115,10 @@ IPAddress AutoWiFi::getIP() const {
     }
 }
 
+String AutoWiFi::getMac() const {
+    return WiFi.macAddress();
+}
+
 AutoWiFi::State AutoWiFi::getState() const {
     return _state;
 }

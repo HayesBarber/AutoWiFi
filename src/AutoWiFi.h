@@ -41,6 +41,13 @@ public:
     IPAddress getIP() const;
 
     /**
+     * Returns the MAC address of the ESP32 as a string.
+     *
+     * @return MAC address in standard colon-separated format.
+     */
+    String getMac() const;
+
+    /**
      * Returns the current connection state.
      *
      * @return Current state as a value of AutoWiFi::State.
