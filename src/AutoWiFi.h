@@ -41,7 +41,7 @@ public:
     IPAddress getIP() const;
 
     /**
-     * Returns the MAC address of the ESP32 as a string.
+     * Returns the MAC address of the device as a string.
      *
      * @return MAC address in standard colon-separated format.
      */
